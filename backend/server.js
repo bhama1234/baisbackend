@@ -1,70 +1,27 @@
-require("dotenv").config(); // ⬅️ Load .env variables first
-
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const app = express();
-const port = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY; // 🔐 Loaded from .env
+app.post("/bais", async (req, res) => {
+  const { query, mode } = req.body;
 
-app.post("/bais/backend/server", async (req, res) => {
-  const userMessage = req.body.message;
-  const mode = req.body.mode || "chat";
-
-  let model = "mistralai/mistral-7b-instruct:free";
-  let systemPrompt = "You are BAIS, a legal assistant for Indian law.";
-
-  switch (mode) {
-    case "auto":
-      model = "tngtech/deepseek-r1t2-chimera:free";
-      systemPrompt = "You are BAIS Auto, a general legal and AI assistant.";
-      break;
-    case "docs":
-      model = "google/gemma-3n-e2b-it:free";
-      systemPrompt = "You are BAIS Docs, an expert in legal document analysis.";
-      break;
-    case "image":
-      model = "google/gemma-3n-e2b-it:free";
-      systemPrompt = "You are BAIS Vision, helping users interpret image-based legal documents.";
-      break;
-    case "voice":
-      model = "tencent/hunyuan-a13b-instruct:free";
-      systemPrompt = "You are BAIS Voice, responding to queries transcribed from voice input.";
-      break;
+  if (!query || !mode) {
+    return res.status(400).json({ response: "Missing query or mode" });
   }
 
-  try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://bhamaassociatesai.netlify.app", // ✅ Match Netlify domain
-        "X-Title": "BAIS"
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage }
-        ]
-      })
-    });
-
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "⚠️ No response from model.";
-    res.json({ reply });
-  } catch (error) {
-    console.error("❌ Error:", error);
-    res.status(500).json({ reply: "⚠️ Error contacting OpenRouter." });
-  }
+  // You can connect this to OpenRouter later
+  return res.json({ response: [`You said: "${query}" in ${mode} mode.`] });
 });
 
-app.listen(port, () => {
-  console.log(`✅ BAIS backend running on http://localhost:${port}`);
+app.get("/", (req, res) => {
+  res.send("✅ BAIS Backend is Running");
+});
+
+app.listen(PORT, () => {
+  console.log(`✅ BAIS server is running on port ${PORT}`);
 });
