@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args)); // ESM workaround
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -9,13 +8,7 @@ const port = process.env.PORT || 8080;
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ Test route to check deployment
-app.get("/", (req, res) => {
-  res.send("✅ BAIS Backend is Running!");
-});
-
-// 🔑 Use your actual OpenRouter key here
-const OPENROUTER_API_KEY = "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";
+const OPENROUTER_API_KEY = "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"; // 🔐 Replace with your real OpenRouter API key
 
 app.post("/bais/backend/server", async (req, res) => {
   const userMessage = req.body.message;
@@ -24,27 +17,32 @@ app.post("/bais/backend/server", async (req, res) => {
   let model = "mistralai/mistral-7b-instruct:free";
   let systemPrompt = "You are BAIS, a legal assistant for Indian law.";
 
-  if (mode === "auto") {
-    model = "openrouter/auto";
-    systemPrompt = "You are BAIS Auto, intelligent legal and general assistant.";
-  } else if (mode === "docs") {
-    model = "google/gemma-3n-e2b-it:free";
-    systemPrompt = "You are BAIS Docs, an expert in legal document analysis and OCR tasks.";
-  } else if (mode === "image") {
-    model = "google/gemma-3n-e2b-it:free";
-    systemPrompt = "You are BAIS Vision, an expert in interpreting image-based legal documents.";
-  } else if (mode === "voice") {
-    model = "openrouter/auto";
-    systemPrompt = "You are BAIS Voice, responding to queries transcribed from voice input.";
+  switch (mode) {
+    case "auto":
+      model = "tngtech/deepseek-r1t2-chimera:free";
+      systemPrompt = "You are BAIS Auto, a general legal and AI assistant.";
+      break;
+    case "docs":
+      model = "google/gemma-3n-e2b-it:free";
+      systemPrompt = "You are BAIS Docs, an expert in legal document analysis.";
+      break;
+    case "image":
+      model = "google/gemma-3n-e2b-it:free";
+      systemPrompt = "You are BAIS Vision, helping users interpret image-based legal documents.";
+      break;
+    case "voice":
+      model = "tencent/hunyuan-a13b-instruct:free";
+      systemPrompt = "You are BAIS Voice, responding to queries transcribed from voice input.";
+      break;
   }
 
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://bhamaassociatesai.netlify.app", // frontend domain
+        "HTTP-Referer": "https://bhamaassociatesai.netlify.app", // ✅ Match Netlify domain
         "X-Title": "BAIS"
       },
       body: JSON.stringify({
@@ -60,11 +58,11 @@ app.post("/bais/backend/server", async (req, res) => {
     const reply = data.choices?.[0]?.message?.content || "⚠️ No response from model.";
     res.json({ reply });
   } catch (error) {
-    console.error("❌ Backend Error:", error);
+    console.error("❌ Error:", error);
     res.status(500).json({ reply: "⚠️ Error contacting OpenRouter." });
   }
 });
 
 app.listen(port, () => {
-  console.log(`✅ BAIS backend running at http://localhost:${port}`);
+  console.log(`✅ BAIS backend running on http://localhost:${port}`);
 });
