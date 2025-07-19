@@ -1,44 +1,31 @@
-const form = document.getElementById("chat-form");
-const input = document.getElementById("user-input");
-const chatBox = document.getElementById("chat-box");
-
-form.addEventListener("submit", async (e) => {
+document.getElementById("bais-form").addEventListener("submit", async function (e) {
   e.preventDefault();
-  const userMessage = input.value.trim();
+
+  const userMessage = document.getElementById("user-message").value.trim();
+  const mode = document.getElementById("mode-selector").value;
+  const chatBox = document.getElementById("chat-box");
+
   if (!userMessage) return;
 
-  addMessage("user", userMessage);
-  input.value = "";
-
-  addMessage("bot", "⏳ Thinking...");
+  chatBox.innerHTML += `<div class="user-message">🧑‍💼 You: ${userMessage}</div>`;
+  document.getElementById("user-message").value = "";
 
   try {
-    const response = await fetch("/bais/backend/server", {
+    const response = await fetch("https://baisbackend-production.up.railway.app/bais/backend/server", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ message: userMessage })
+      body: JSON.stringify({ message: userMessage, mode })
     });
 
     const data = await response.json();
-    const botMessage = data.reply || "⚠️ Sorry, something went wrong.";
-    replaceLastBotMessage(botMessage);
-  } catch (err) {
-    replaceLastBotMessage("⚠️ Failed to connect to server.");
+    const reply = data.reply;
+
+    chatBox.innerHTML += `<div class="bais-reply">🤖 BAIS: ${reply}</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+  } catch (error) {
+    console.error("❌ Error:", error);
+    chatBox.innerHTML += `<div class="bais-reply error">⚠️ Error contacting backend.</div>`;
   }
 });
-
-function addMessage(sender, text) {
-  const msg = document.createElement("div");
-  msg.className = `message ${sender}`;
-  msg.textContent = text;
-  chatBox.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function replaceLastBotMessage(text) {
-  const messages = chatBox.querySelectorAll(".message.bot");
-  const lastMsg = messages[messages.length - 1];
-  if (lastMsg) lastMsg.textContent = text;
-}
