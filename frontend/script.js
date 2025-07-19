@@ -1,54 +1,61 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const sendBtn = document.querySelector("button[type='submit']");
-  const userInput = document.getElementById("user-message");
-  const chatContainer = document.getElementById("chat-box");
-  const modeSelector = document.getElementById("mode-selector");
+document.addEventListener("DOMContentLoaded", function () {
+  const sendBtn = document.getElementById("sendBtn");
+  const userInput = document.getElementById("userInput");
+  const chatContainer = document.getElementById("chatContainer");
+  const modeSelector = document.getElementById("mode");
+  const toggleBtn = document.getElementById("darkModeToggle");
 
-  const appendMessage = (sender, message) => {
-    const messageElem = document.createElement("div");
-    messageElem.className = sender;
-    messageElem.innerText = `${sender === "user" ? "🧑‍💼 You" : "🤖 BAIS"}: ${message}`;
-    chatContainer.appendChild(messageElem);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-  };
+  toggleBtn.addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+  });
 
-  const sendMessage = async () => {
-    const message = userInput.value.trim();
-    if (!message) return;
+  sendBtn.addEventListener("click", async () => {
+    const input = userInput.value.trim();
+    const mode = modeSelector.value;
 
-    const mode = modeSelector?.value || "chat";
+    if (!input) return;
 
-    appendMessage("user", message);
+    appendMessage("user", input);
     userInput.value = "";
 
-    appendMessage("bot", "⌛ Thinking...");
+    appendMessage("bais", "⏳ Thinking...");
 
     try {
-      const response = await fetch("https://baisbackend-production.up.railway.app/bais/backend/server", {
+      const res = await fetch("https://baisbackend-production.up.railway.app/bais", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, mode })
+        body: JSON.stringify({ query: input, mode })
       });
 
-      const data = await response.json();
+      const data = await res.json();
+      const responses = Array.isArray(data.response) ? data.response : [data.response];
 
-      const replyElements = chatContainer.querySelectorAll(".bot");
-      replyElements[replyElements.length - 1].innerText = `🤖 BAIS: ${data.reply}`;
+      chatContainer.lastChild.remove();
+
+      for (const msg of responses) {
+        appendMessage("bais", msg);
+      }
     } catch (err) {
-      const replyElements = chatContainer.querySelectorAll(".bot");
-      replyElements[replyElements.length - 1].innerText = "🤖 BAIS: ⚠️ No response from server.";
-    }
-  };
-
-  sendBtn.addEventListener("click", (e) => {
-    e.preventDefault(); // prevent form submission refresh
-    sendMessage();
-  });
-
-  userInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      sendMessage();
+      chatContainer.lastChild.remove();
+      appendMessage("bais", "⚠️ Error connecting to backend.");
+      console.error(err);
     }
   });
+
+  function appendMessage(sender, message) {
+    const messageElem = document.createElement("div");
+    messageElem.className = `animate-fade ${
+      sender === "user" ? "text-right" : "text-left"
+    }`;
+    messageElem.innerHTML = `
+      <span class="block text-sm ${
+        sender === "user" ? "text-blue-300" : "text-green-400"
+      } font-semibold">${sender === "user" ? "🧑‍💼 You" : "🤖 BAIS"}</span>
+      <div class="bg-gray-800 rounded-lg px-4 py-2 mt-1 inline-block max-w-[80%] ${
+        sender === "user" ? "ml-auto" : "mr-auto"
+      }">${message}</div>
+    `;
+    chatContainer.appendChild(messageElem);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
 });
