@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const sendBtn = document.getElementById("sendBtn");
+  const sendBtn = document.querySelector("button[type='submit']");
   const userInput = document.getElementById("user-message");
-  const chatContainer = document.getElementById("chatContainer");
+  const chatContainer = document.getElementById("chat-box");
   const modeSelector = document.getElementById("mode-selector");
 
   const appendMessage = (sender, message) => {
@@ -40,8 +40,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  sendBtn.addEventListener("click", sendMessage);
+  sendBtn.addEventListener("click", (e) => {
+    e.preventDefault(); // prevent form submission refresh
+    sendMessage();
+  });
+
   userInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendMessage();
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendMessage();
+    }
   });
 });
