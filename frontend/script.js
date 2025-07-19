@@ -1,31 +1,47 @@
-document.getElementById("bais-form").addEventListener("submit", async function (e) {
-  e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+  const sendBtn = document.getElementById("sendBtn");
+  const userInput = document.getElementById("user-message");
+  const chatContainer = document.getElementById("chatContainer");
+  const modeSelector = document.getElementById("mode-selector");
 
-  const userMessage = document.getElementById("user-message").value.trim();
-  const mode = document.getElementById("mode-selector").value;
-  const chatBox = document.getElementById("chat-box");
+  const appendMessage = (sender, message) => {
+    const messageElem = document.createElement("div");
+    messageElem.className = sender;
+    messageElem.innerText = `${sender === "user" ? "🧑‍💼 You" : "🤖 BAIS"}: ${message}`;
+    chatContainer.appendChild(messageElem);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  };
 
-  if (!userMessage) return;
+  const sendMessage = async () => {
+    const message = userInput.value.trim();
+    if (!message) return;
 
-  chatBox.innerHTML += `<div class="user-message">🧑‍💼 You: ${userMessage}</div>`;
-  document.getElementById("user-message").value = "";
+    const mode = modeSelector?.value || "chat";
 
-  try {
-    const response = await fetch("https://baisbackend-production.up.railway.app/bais/backend/server", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message: userMessage, mode })
-    });
+    appendMessage("user", message);
+    userInput.value = "";
 
-    const data = await response.json();
-    const reply = data.reply;
+    appendMessage("bot", "⌛ Thinking...");
 
-    chatBox.innerHTML += `<div class="bais-reply">🤖 BAIS: ${reply}</div>`;
-    chatBox.scrollTop = chatBox.scrollHeight;
-  } catch (error) {
-    console.error("❌ Error:", error);
-    chatBox.innerHTML += `<div class="bais-reply error">⚠️ Error contacting backend.</div>`;
-  }
+    try {
+      const response = await fetch("https://baisbackend-production.up.railway.app/bais/backend/server", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, mode })
+      });
+
+      const data = await response.json();
+
+      const replyElements = chatContainer.querySelectorAll(".bot");
+      replyElements[replyElements.length - 1].innerText = `🤖 BAIS: ${data.reply}`;
+    } catch (err) {
+      const replyElements = chatContainer.querySelectorAll(".bot");
+      replyElements[replyElements.length - 1].innerText = "🤖 BAIS: ⚠️ No response from server.";
+    }
+  };
+
+  sendBtn.addEventListener("click", sendMessage);
+  userInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
 });

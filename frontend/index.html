@@ -1,17 +1,42 @@
+<!-- File: index.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BAIS - Your Legal AI</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BAIS - Akhilesh Bhama Intelligent System</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Dark mode config -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bais: {
+              light: '#f1f5f9',
+              dark: '#1e293b'
+            }
+          }
+        }
+      }
+    };
+  </script>
 </head>
-<body>
-  <div class="chat-container">
-    <div class="chat-header">🤖 BAIS — Akhilesh Bhama Intelligent System</div>
-    
-    <!-- MODE SELECTOR -->
-    <select id="mode-selector" class="mode-selector">
+<body class="bg-bais-dark text-white flex items-center justify-center min-h-screen p-4">
+
+  <div class="w-full max-w-2xl bg-bais-dark rounded-2xl shadow-lg p-6 space-y-4 border border-gray-700">
+
+    <!-- Header -->
+    <div class="text-center text-xl font-semibold mb-2">
+      🤖 <span class="text-blue-400">BAIS</span> — Akhilesh Bhama Intelligent System
+    </div>
+
+    <!-- Mode selector -->
+    <select id="mode" class="w-full bg-gray-800 text-white rounded-xl px-4 py-2 focus:outline-none">
       <option value="chat">🧠 Chat</option>
       <option value="auto">🤖 Auto</option>
       <option value="docs">📄 Docs</option>
@@ -19,16 +44,30 @@
       <option value="voice">🎤 Voice</option>
     </select>
 
-    <!-- CHAT BOX -->
-    <div id="chat-box" class="chat-box"></div>
+    <!-- Chat display -->
+    <div id="chatContainer" class="h-96 overflow-y-auto bg-gray-900 rounded-xl p-4 space-y-2 border border-gray-700">
+      <!-- Messages will appear here -->
+    </div>
 
-    <!-- CHAT FORM -->
-    <form id="bais-form" class="chat-form">
-      <input type="text" id="user-message" placeholder="Type your message..." autocomplete="off" required />
-      <button type="submit">Send</button>
-    </form>
+    <!-- Input form -->
+    <div class="flex space-x-2">
+      <input
+        type="text"
+        id="userInput"
+        placeholder="Type your message..."
+        class="flex-1 bg-gray-800 text-white px-4 py-2 rounded-xl focus:outline-none"
+        autocomplete="off"
+      />
+      <button
+        id="sendBtn"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition duration-300"
+      >
+        Send
+      </button>
+    </div>
   </div>
 
+  <!-- Script -->
   <script src="script.js"></script>
 </body>
 </html>
