@@ -1,3 +1,5 @@
+require("dotenv").config(); // ⬅️ Load .env variables first
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -8,7 +10,7 @@ const port = process.env.PORT || 8080;
 app.use(cors());
 app.use(bodyParser.json());
 
-const OPENROUTER_API_KEY = "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"; // 🔐 Replace with your real OpenRouter API key
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY; // 🔐 Loaded from .env
 
 app.post("/bais/backend/server", async (req, res) => {
   const userMessage = req.body.message;
