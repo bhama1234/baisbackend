@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 
 const OPENROUTER_API_KEY = "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";
 
-app.post("/bais/backend/server", async (req, res) => {
+app.post("/server", async (req, res) => {
   const userMessage = req.body.message;
   const mode = req.body.mode || "chat";
 
