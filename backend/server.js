@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args)); // Dynamic import
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -8,13 +9,12 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-const OPENROUTER_API_KEY = "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"; // Replace this with your real OpenRouter API key
+const OPENROUTER_API_KEY = "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"; // Replace with your real key
 
 app.post("/bais/backend/server", async (req, res) => {
   const userMessage = req.body.message;
-  const mode = req.body.mode || "chat"; // default mode is chat
+  const mode = req.body.mode || "chat";
 
-  // Select model and system prompt based on mode
   let model = "mistralai/mistral-7b-instruct:free";
   let systemPrompt = "You are BAIS, a legal assistant for Indian law.";
 
@@ -38,7 +38,7 @@ app.post("/bais/backend/server", async (req, res) => {
       headers: {
         "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://https://bhamaassociatesai.netlify.app",
+        "HTTP-Referer": "https://bhamaassociatesai.netlify.app", // ✅ Required by OpenRouter
         "X-Title": "BAIS"
       },
       body: JSON.stringify({
@@ -51,11 +51,12 @@ app.post("/bais/backend/server", async (req, res) => {
     });
 
     const data = await response.json();
+
     const reply = data.choices?.[0]?.message?.content || "⚠️ No response from model.";
     res.json({ reply });
   } catch (error) {
-    console.error("Error communicating with OpenRouter:", error);
-    res.status(500).json({ reply: "⚠️ Error communicating with OpenRouter." });
+    console.error("❌ Error from OpenRouter:", error);
+    res.status(500).json({ reply: "⚠️ Error contacting model API." });
   }
 });
 
