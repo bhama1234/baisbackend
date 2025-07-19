@@ -2,9 +2,15 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
-app.use(cors());
+// ✅ Open CORS for all origins and headers
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"]
+}));
+
 app.use(express.json());
 
 app.post("/bais", async (req, res) => {
@@ -14,7 +20,7 @@ app.post("/bais", async (req, res) => {
     return res.status(400).json({ response: "Missing query or mode" });
   }
 
-  // You can connect this to OpenRouter later
+  // Placeholder response
   return res.json({ response: [`You said: "${query}" in ${mode} mode.`] });
 });
 
