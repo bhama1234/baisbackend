@@ -10,8 +10,16 @@
   <div class="chat-container">
     <div class="chat-header">🤖 BAIS — Akhilesh Bhama Intelligent System</div>
     <div id="chat-box" class="chat-box"></div>
-    <form id="chat-form" class="chat-form">
-      <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off" required />
+
+    <form id="bais-form" class="chat-form">
+      <input type="text" id="user-message" placeholder="Type your message..." autocomplete="off" required />
+      <select id="mode-selector">
+        <option value="chat">Chat</option>
+        <option value="auto">Auto</option>
+        <option value="docs">Docs</option>
+        <option value="image">Image</option>
+        <option value="voice">Voice</option>
+      </select>
       <button type="submit">Send</button>
     </form>
   </div>
