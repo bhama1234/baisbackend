@@ -8,7 +8,7 @@ const port = process.env.PORT || 8080;
 app.use(cors());
 app.use(bodyParser.json());
 
-const OPENROUTER_API_KEY = "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"; // 🔐 Replace with your real OpenRouter API key
+const OPENROUTER_API_KEY = "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"; // 🔐 Replace with your real OpenRouter API key
 
 app.post("/bais/backend/server", async (req, res) => {
   const userMessage = req.body.message;
