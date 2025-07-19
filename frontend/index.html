@@ -1,24 +1,22 @@
-<!-- File: index.html -->
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BAIS - Akhilesh Bhama Intelligent System</title>
-
-  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Dark mode config -->
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          colors: {
-            bais: {
-              light: '#f1f5f9',
-              dark: '#1e293b'
+          animation: {
+            fade: 'fadeIn 0.4s ease-in-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: 0, transform: 'translateY(5px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' },
             }
           }
         }
@@ -26,17 +24,21 @@
     };
   </script>
 </head>
-<body class="bg-bais-dark text-white flex items-center justify-center min-h-screen p-4">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-start px-4 pt-6">
 
-  <div class="w-full max-w-2xl bg-bais-dark rounded-2xl shadow-lg p-6 space-y-4 border border-gray-700">
+  <!-- Navbar -->
+  <div class="w-full max-w-4xl flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">🤖 BAIS</h1>
+    <button id="darkModeToggle" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-xl">
+      Toggle 🌗
+    </button>
+  </div>
 
-    <!-- Header -->
-    <div class="text-center text-xl font-semibold mb-2">
-      🤖 <span class="text-blue-400">BAIS</span> — Akhilesh Bhama Intelligent System
-    </div>
+  <!-- Main container -->
+  <div class="w-full max-w-2xl bg-gray-800 rounded-2xl shadow-2xl p-6 space-y-4 border border-gray-700">
 
-    <!-- Mode selector -->
-    <select id="mode" class="w-full bg-gray-800 text-white rounded-xl px-4 py-2 focus:outline-none">
+    <!-- Mode Selector -->
+    <select id="mode" class="w-full bg-gray-700 text-white rounded-xl px-4 py-2 focus:outline-none">
       <option value="chat">🧠 Chat</option>
       <option value="auto">🤖 Auto</option>
       <option value="docs">📄 Docs</option>
@@ -44,23 +46,23 @@
       <option value="voice">🎤 Voice</option>
     </select>
 
-    <!-- Chat display -->
+    <!-- Chat Display -->
     <div id="chatContainer" class="h-96 overflow-y-auto bg-gray-900 rounded-xl p-4 space-y-2 border border-gray-700">
       <!-- Messages will appear here -->
     </div>
 
-    <!-- Input form -->
-    <div class="flex space-x-2">
+    <!-- Input area -->
+    <div class="flex flex-col sm:flex-row gap-2">
       <input
         type="text"
         id="userInput"
         placeholder="Type your message..."
-        class="flex-1 bg-gray-800 text-white px-4 py-2 rounded-xl focus:outline-none"
+        class="flex-1 bg-gray-700 text-white px-4 py-2 rounded-xl focus:outline-none"
         autocomplete="off"
       />
       <button
         id="sendBtn"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition duration-300"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl transition-all duration-300"
       >
         Send
       </button>
@@ -69,5 +71,11 @@
 
   <!-- Script -->
   <script src="script.js"></script>
+  <script>
+    const toggleBtn = document.getElementById("darkModeToggle");
+    toggleBtn.addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
+    });
+  </script>
 </body>
 </html>
