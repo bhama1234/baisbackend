@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
-require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +14,9 @@ const allowedModels = {
   draft: "tencent/hunyuan-a13b-instruct:free",
   analyse: "tngtech/deepseek-r1t2-chimera:free"
 };
+
+// 🚨 Hardcoded API Key just for debugging. Revert to dotenv later.
+const OPENROUTER_API_KEY = "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";
 
 app.post("/bais", async (req, res) => {
   const { query, mode } = req.body;
@@ -31,13 +33,19 @@ app.post("/bais", async (req, res) => {
       {
         model,
         messages: [
-          { role: "system", content: `You are BAIS, a legal AI assistant working in '${mode}' mode.` },
-          { role: "user", content: query }
+          {
+            role: "system",
+            content: `You are BAIS, a legal AI assistant working in '${mode}' mode.`
+          },
+          {
+            role: "user",
+            content: query
+          }
         ]
       },
       {
         headers: {
-          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
           "Content-Type": "application/json"
         }
       }
