@@ -1,69 +1,62 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const chatBox = document.getElementById('chat-box');
-    const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
-    const themeToggle = document.getElementById('theme-toggle');
 
-    sendBtn.addEventListener('click', sendMessage);
-    userInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
+document.addEventListener("DOMContentLoaded", function () {
+  const sendBtn = document.getElementById("sendBtn");
+  const userInput = document.getElementById("userInput");
+  const chatContainer = document.getElementById("chatContainer");
+  const modeSelector = document.getElementById("mode");
+  const toggleBtn = document.getElementById("darkModeToggle");
 
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-    });
+  toggleBtn.addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+  });
 
-    function sendMessage() {
-        const messageText = userInput.value.trim();
-        if (messageText === '') return;
+  sendBtn.addEventListener("click", async () => {
+    const input = userInput.value.trim();
+    const mode = modeSelector.value;
 
-        appendMessage('user', messageText);
-        userInput.value = '';
-        userInput.style.height = 'auto'; // Reset height
+    if (!input) return;
 
-        // Simulate bot response
-        setTimeout(() => {
-            appendMessage('bot', 'This is a simulated response.');
-        }, 1000);
+    appendMessage("user", input);
+    userInput.value = "";
+
+    appendMessage("bais", "⏳ Thinking...");
+
+    try {
+      const res = await fetch("https://rare-tenderness-production.up.railway.app/bais", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: input, mode })
+      });
+
+      const data = await res.json();
+      const responses = Array.isArray(data.response) ? data.response : [data.response];
+
+      chatContainer.lastChild.remove();
+
+      for (const msg of responses) {
+        appendMessage("bais", msg);
+      }
+    } catch (err) {
+      chatContainer.lastChild.remove();
+      appendMessage("bais", "⚠️ Error connecting to backend.");
+      console.error(err);
     }
+  });
 
-    function appendMessage(sender, text) {
-        const messageElem = document.createElement('div');
-        messageElem.classList.add('message', sender);
-
-        const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        let content = `
-            <div class="info">${sender === 'user' ? 'You' : 'Bot'} • ${timestamp}</div>
-            <div class="bubble">
-                ${text}
-                ${sender === 'bot' ? '<button class="copy-btn">📋</button>' : ''}
-            </div>
-        `;
-        messageElem.innerHTML = content;
-        chatBox.appendChild(messageElem);
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        if (sender === 'bot') {
-            const copyBtn = messageElem.querySelector('.copy-btn');
-            copyBtn.addEventListener('click', () => {
-                navigator.clipboard.writeText(text).then(() => {
-                    copyBtn.textContent = '✅';
-                    setTimeout(() => {
-                        copyBtn.textContent = '📋';
-                    }, 2000);
-                });
-            });
-        }
-    }
-
-    // Auto-resize textarea
-    userInput.addEventListener('input', () => {
-        userInput.style.height = 'auto';
-        userInput.style.height = (userInput.scrollHeight) + 'px';
-    });
+  function appendMessage(sender, message) {
+    const messageElem = document.createElement("div");
+    messageElem.className = `animate-fade ${
+      sender === "user" ? "text-right" : "text-left"
+    }`;
+    messageElem.innerHTML = `
+      <span class="block text-sm ${
+        sender === "user" ? "text-blue-300" : "text-green-400"
+      } font-semibold">${sender === "user" ? "🧑‍💼 You" : "🤖 BAIS"}</span>
+      <div class="bg-gray-800 rounded-lg px-4 py-2 mt-1 inline-block max-w-[80%] ${
+        sender === "user" ? "ml-auto" : "mr-auto"
+      }">${message}</div>
+    `;
+    chatContainer.appendChild(messageElem);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
 });
