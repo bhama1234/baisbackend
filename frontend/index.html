@@ -12,11 +12,16 @@
         extend: {
           animation: {
             fade: 'fadeIn 0.4s ease-in-out',
+            slide: 'slideIn 0.4s ease-in-out',
           },
           keyframes: {
             fadeIn: {
-              '0%': { opacity: 0, transform: 'translateY(5px)' },
-              '100%': { opacity: 1, transform: 'translateY(0)' },
+              '0%': { opacity: 0 },
+              '100%': { opacity: 1 },
+            },
+            slideIn: {
+              '0%': { transform: 'translateY(10px)' },
+              '100%': { transform: 'translateY(0)' },
             }
           }
         }
@@ -27,7 +32,7 @@
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-start px-4 pt-6">
 
   <!-- Navbar -->
-  <div class="w-full max-w-4xl flex justify-between items-center mb-6">
+  <div class="w-full max-w-4xl flex justify-between items-center mb-6 animate-fade">
     <h1 class="text-2xl font-bold">🤖 BAIS</h1>
     <button id="darkModeToggle" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-xl">
       Toggle 🌗
@@ -35,7 +40,7 @@
   </div>
 
   <!-- Main container -->
-  <div class="w-full max-w-2xl bg-gray-800 rounded-2xl shadow-2xl p-6 space-y-4 border border-gray-700">
+  <div class="w-full max-w-2xl bg-gray-800 rounded-2xl shadow-2xl p-6 space-y-4 border border-gray-700 animate-slide">
 
     <!-- Mode Selector -->
     <select id="mode" class="w-full bg-gray-700 text-white rounded-xl px-4 py-2 focus:outline-none">
@@ -49,6 +54,11 @@
     <!-- Chat Display -->
     <div id="chatContainer" class="h-96 overflow-y-auto bg-gray-900 rounded-xl p-4 space-y-2 border border-gray-700">
       <!-- Messages will appear here -->
+    </div>
+
+    <!-- Typing Indicator -->
+    <div id="typingIndicator" class="text-gray-400 text-sm hidden">
+      BAIS is typing...
     </div>
 
     <!-- Input area -->
